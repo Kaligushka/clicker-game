@@ -34,9 +34,16 @@ This project was created as one of my first C# projects to practice programming 
 
 ## 🚀 How to Run
 
-1. Clone this repository.
-2. Open the project in Visual Studio.
-3. Build and run the application.
+1. Download this repository:
+   - Click the green **Code** button.
+   - Select **Download ZIP**.
+   - Extract the downloaded ZIP file.
+
+2. Open the extracted folder.
+
+3. Open the `clicker-game.sln` file in Visual Studio.
+
+4. Press **F5** or click the **Start** (▶) button to build and run the game.
 
 ## 📚 What I Practiced
 
