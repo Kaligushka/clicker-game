@@ -4,15 +4,17 @@ A simple console-based clicker game developed in C#.
 
 ## 📖 About
 
-This project was created as one of my first C# projects to practice programming fundamentals and build my portfolio. The game allows players to earn coins, buy upgrades, and increase their income over time.
+This project was created as one of my first C# projects to practice programming fundamentals and improve my coding skills. The game allows players to earn coins, purchase upgrades, and automate their progress with auto-clickers.
 
 ## ✨ Features
 
 - 🪙 Earn coins by clicking
 - ⬆️ Upgrade click power
-- 🤖 Buy an auto-clicker
-- ⚡ Upgrade the auto-clicker
+- 🤖 Buy multiple auto-clickers
+- ⚡ Upgrade auto-clicker power
 - 📈 Upgrade prices increase as you progress
+- 🔔 In-game notification system
+- 🎨 Clean and organized console interface
 
 ## 🎮 Controls
 
@@ -34,7 +36,7 @@ This project was created as one of my first C# projects to practice programming 
 
 1. Clone this repository.
 2. Open the project in Visual Studio.
-3. Build and run the project.
+3. Build and run the application.
 
 ## 📚 What I Practiced
 
@@ -44,17 +46,27 @@ This project was created as one of my first C# projects to practice programming 
 - Methods
 - Asynchronous programming (`Task` / `async`)
 - Console input handling
+- Code organization
+- Refactoring
 
 ## 🔮 Planned Features
 
-- Support for purchasing multiple auto-clickers
-- Better balance system
-- Additional upgrades
-- Bug fixes and code improvements
+- More upgrades
+- Save/Load system
+- Better balancing
+- More gameplay mechanics
 
-## 📝 Note
+## ✨ New in Version 1.1
 
-Some text mistakes were noticed after the initial release and will be fixed in the next update.
+- Added support for purchasing multiple auto-clickers
+- Improved game balance
+- Refactored the code into separate methods
+- Improved code readability
+- General code improvements
+
+## 📌 Version
+
+**Current version:** **1.1**
 
 ---
 

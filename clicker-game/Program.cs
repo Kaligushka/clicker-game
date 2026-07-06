@@ -1,94 +1,166 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-int coins = 0;
-int coinsPerClick = 1;
-int ACUpgradePrice = 250;
-int ClickUpgradePrice = 10;
-int ACclick = 2;
-bool isACBought = false;
+string lastNotification = "";
+int notificationId = 0; 
 
-Console.WriteLine("Clicker has been started");
-Console.WriteLine("Istruction:");
-Console.WriteLine("Press [Space] to get coins(1 per click)");
-Console.WriteLine("Press [U] to upgrade your clicks, it costs 10 coins initially, and the price doubles with each purchase until it reaches 5,120 ");
-Console.WriteLine("Press [I] to view the balance");
-Console.WriteLine("Press [O] to buy AutoClicker that give 2 coins per second, it costs 500 coins");
-Console.WriteLine("Press [P] to buy AutoClicker upgrade, it costs 250 coins, and increases autoclicker revenue by 2");
-Console.WriteLine($"Current balace: {coins}");
+// Player economy and stats
+int coins = 0;
+
+int coinsPerClick = 1;
+int autoClickPower = 2;
+
+int autoClickerUpgradePrice = 250;
+int ClickUpgradePrice = 10;
+int autoClickerPrice = 500;
+
+const int maxClickUpgradePrice = 81920;
+const int maxACUpgradePrice = 64000;
+
+int ACAmount = 0;
+
+
+DrawUI();
 
 Task.Run(() => StartAC());
 
+// Main input handling loop(Dispatcher)
 while (true)
 {
     ConsoleKey key = Console.ReadKey(true).Key;
 
-    if (key == ConsoleKey.Spacebar)
-    {
-        coins += coinsPerClick;
-        Console.WriteLine("Click!");
-    }
-
-    if (key == ConsoleKey.U)
-    {
-        if (coins >= ClickUpgradePrice)
-        {
-            coinsPerClick++;
-            coins -= ClickUpgradePrice;
-            if (ClickUpgradePrice * 2 <= 5120)
-            {
-                ClickUpgradePrice *= 2;
-                Console.WriteLine($"Current click upgrade price: {ClickUpgradePrice}");
-            }
-            Console.WriteLine("Upgrade purchase successful");
-        }
-        else
-        {
-            Console.WriteLine("Not enough money");
-        }
-    }
-    if (key == ConsoleKey.I)
-    {
-        Console.WriteLine($"Your Balance: {coins}");
-    }
-    if (key == ConsoleKey.O)
-    {
-        if (coins >= 500 && isACBought == false)
-        {
-            isACBought = true;
-            coins -= 500;
-            Console.WriteLine("Autoclicker purchase successful");
-        }
-        else
-        {
-            Console.WriteLine("Not enough money or an auto-clicker that has been purchased");
-        }
-    }
-    if (key == ConsoleKey.P)
-    {
-        if (coins >= ACUpgradePrice && isACBought == true)
-        {
-            coins -= ACUpgradePrice;
-            ACclick += 2;
-            Console.WriteLine($"Autoclicker upgrade purchase successful, current coins per click: {ACclick}");
-        }
-        else
-        {
-            Console.WriteLine("Not enough money or an auto-clicker that hasn't been purchased");
-        }
-    }
+    if (key == ConsoleKey.Spacebar) TryClick();
+    if (key == ConsoleKey.U) TryUpgradeClick();
+    if (key == ConsoleKey.O) TryBuyAC();
+    if (key == ConsoleKey.P) TryBuyACUpgrade();
 
 }
 
+// --- CORE METHODS ---
+
+// Updates statistics and clears consoles to prevent clutter
+void DrawUI()
+{
+    Console.Clear();
+
+    Console.WriteLine("=== 🎮 CONSOLE CLICKER 1.1 ===");
+    Console.WriteLine("Instruction:");
+    Console.WriteLine($"  [Space] - Get coins (+{coinsPerClick} per click)");
+
+    
+    Console.WriteLine($"  [U]     - Upgrade your clicks (Cost: {ClickUpgradePrice} coins, price doubles)");
+
+    
+    Console.WriteLine($"  [O]     - Buy AutoClicker (Cost: {autoClickerPrice} coins, gives {autoClickPower} coins/sec)");
+
+    
+    Console.WriteLine($"  [P]     - Upgrade AutoClicker (Cost: {autoClickerUpgradePrice} coins)");
+    Console.WriteLine("--------------------------------------------");
+
+    
+    Console.WriteLine($"🤖 AutoClickers amount: {ACAmount} (Generating: {autoClickPower * ACAmount} coins/sec)");
+    Console.WriteLine($"💰 Current balance: {coins} coins");
+    Console.WriteLine("--------------------------------------------");
+
+    if (!string.IsNullOrEmpty(lastNotification))
+    {
+        Console.WriteLine(lastNotification);
+    }
+}
+
+// Handles manual player clicks
+void TryClick()
+{
+    coins += coinsPerClick;
+    _ = ShowNotification($"Click!(+ {coinsPerClick})");
+}
+
+// Upgrades manual click power and doubles the price
+void TryUpgradeClick()
+{
+    if (coins >= ClickUpgradePrice)
+    {
+        coinsPerClick++;
+        coins -= ClickUpgradePrice;
+        if (ClickUpgradePrice * 2 <= maxClickUpgradePrice)
+        {
+            ClickUpgradePrice *= 2;
+        }
+        _ = ShowNotification("Upgrade purchase successful");
+    }
+    else
+    {
+        _ = ShowNotification("Not enough money");
+    }
+}
+
+// Purchases a new AutoClicker and scales the price exponentially
+void TryBuyAC()
+{
+    if (coins >= autoClickerPrice)
+    {
+        ACAmount++;
+        coins -= autoClickerPrice;
+
+        autoClickerPrice = (int)(autoClickerPrice * 1.5);
+
+        _ = ShowNotification("Autoclicker purchase successful");
+    }
+    else
+    {
+        _ = ShowNotification("Not enough money");
+    }
+}
+
+// Upgrades the base efficiency of all owned AutoClickers
+void TryBuyACUpgrade()
+{
+    if (coins >= autoClickerUpgradePrice && ACAmount > 0)
+    {
+        coins -= autoClickerUpgradePrice;
+        
+        if(autoClickerUpgradePrice * 2 <= maxACUpgradePrice) 
+        {
+            autoClickerUpgradePrice *= 2;
+        }
+
+        autoClickPower += 2;
+        _ = ShowNotification($"Autoclicker upgrade successful! New power: {autoClickPower} coins/sec");
+    }
+    else
+    {
+        _ = ShowNotification("Not enough money or an auto-clicker that hasn't been purchased");
+    }
+}
+
+// Manages temporary on-screen messages using thread-safe ID filtering
+async Task ShowNotification(string message)
+{
+    notificationId++;
+    int currentId = notificationId;
+    
+    lastNotification = message;
+    DrawUI();
+
+    await Task.Delay(2000);
+
+    if(currentId == notificationId) 
+    {
+        lastNotification = "";
+        DrawUI();
+    }
+}
+
+// Background loop for passive income generation
 async Task StartAC()
 {
     while (true)
     {
         await Task.Delay(1000);
-        if (isACBought)
+        if (ACAmount > 0)
         {
-            coins += ACclick;
-            Console.WriteLine("AC click!");
+            coins += autoClickPower * ACAmount;
+            DrawUI();
         }
 
     }
